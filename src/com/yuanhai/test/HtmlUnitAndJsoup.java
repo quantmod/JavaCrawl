@@ -9,6 +9,7 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.safety.Whitelist;
 import org.jsoup.select.Elements;
 import org.junit.Assert;
 import org.junit.Test;
@@ -141,7 +142,9 @@ public class HtmlUnitAndJsoup {
 				wc.getOptions().setTimeout(10000); //设置连接超时时间 ，这里是10S。如果为0，则无限期等待  
 				HtmlPage page = wc.getPage("http://passport.tianya.cn/login.jsp");  
 				String pageXml = page.asXml(); //以xml的形式获取响应文本  
-  
+                
+				//服务器端进行校验并清除有害的HTML代码
+				Jsoup.clean(pageXml, Whitelist.basic());
 				/**jsoup解析文档*/  
 				//把String转化成document格式 
 				Document doc = Jsoup.parse(pageXml);  
