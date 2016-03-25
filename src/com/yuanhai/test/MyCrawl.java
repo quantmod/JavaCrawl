@@ -1,4 +1,4 @@
-package com.lulei.util;
+package com.yuanhai.test;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -40,6 +40,8 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.NIOFSDirectory;
 import org.apache.lucene.util.Version;
 import org.junit.Test;
+
+import com.lulei.util.CharsetUtil;
 
 public class MyCrawl {
 	private static int maxConnectTimes = 3;
