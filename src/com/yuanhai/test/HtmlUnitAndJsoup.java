@@ -13,6 +13,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.gargoylesoftware.htmlunit.BrowserVersion;
+import com.gargoylesoftware.htmlunit.DefaultCredentialsProvider;
+import com.gargoylesoftware.htmlunit.NicelyResynchronizingAjaxController;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlButton;
@@ -101,6 +103,11 @@ public class HtmlUnitAndJsoup {
 
 			webClient.getOptions().setJavaScriptEnabled(true); // 启用JS解释器，默认为true
 			webClient.getOptions().setCssEnabled(false); // 禁用css支持
+			// 设置Ajax异步处理控制器即启用Ajax支持
+			webClient
+					.setAjaxController(new NicelyResynchronizingAjaxController());
+			// 当出现Http error时，程序不抛异常继续执行
+			webClient.getOptions().setThrowExceptionOnFailingStatusCode(false);
 			// 防止js语法错误抛出异常
 			webClient.getOptions().setThrowExceptionOnScriptError(false); // js运行错误时，是否抛出异常
 
@@ -147,15 +154,15 @@ public class HtmlUnitAndJsoup {
 			HtmlButton submit = (HtmlButton) page.getElementById("loginBtn");
 
 			// 方法二，通过XPath获取，XPath通常用于无法通过Id搜索，或者需要更为复杂的搜索时
-			HtmlDivision div=(HtmlDivision) page.getByXPath("//div").get(0);
+			HtmlDivision div = (HtmlDivision) page.getByXPath("//div").get(0);
 
-			//网络爬虫中主要目的就是获取页面中所有的链接
+			// 网络爬虫中主要目的就是获取页面中所有的链接
 
-				java.util.List<HtmlAnchor> achList=page.getAnchors();
-				for(HtmlAnchor ach:achList){
+			java.util.List<HtmlAnchor> achList = page.getAnchors();
+			for (HtmlAnchor ach : achList) {
 				System.out.println(ach.getHrefAttribute());
-				}
-				
+			}
+
 			System.out.println("-------jsoup部分------");
 			// 服务器端进行校验并清除有害的HTML代码,防止富文本提交有害代码
 			Jsoup.clean(pageXml, Whitelist.basic());
@@ -169,6 +176,23 @@ public class HtmlUnitAndJsoup {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	// htmlunit设置代理上网
+	@Test
+	public void proxy() {
+		String proxyHost = "192.168.0.1";
+		int port = 80;
+		WebClient webClient = new WebClient(BrowserVersion.CHROME, proxyHost,
+				port);
+
+		webClient.setAjaxController(new NicelyResynchronizingAjaxController());
+
+		DefaultCredentialsProvider credentialsProvider = (DefaultCredentialsProvider) webClient
+				.getCredentialsProvider();
+		String username = "account";
+		String password = "password";
+		credentialsProvider.addCredentials(username, password);
 	}
 
 	// jsoup请求并解析
