@@ -49,11 +49,12 @@ public class MyCrawl {
 	private static Logger log = Logger.getLogger(MyCrawl.class);
 	private static Header[] responseHeaders = null;
 	private static String pageSourceCode = "";
-	// ÍøÒ³Ä¬ÈÏ±àÂë·½Ê½
+	// ç½‘é¡µé»˜è®¤ç¼–ç æ–¹å¼
 	private static String charsetName = "iso-8859-1";
 
-	// ÕıÔòÆ¥ÅäĞèÒª¿´ÍøÒ³µÄÔ´Âë,firebug¿´µÄ²»ĞĞ
-	// ÅÀ³æ+½¨Á¢Ë÷Òı
+	// æ­£åˆ™åŒ¹é…éœ€è¦çœ‹ç½‘é¡µçš„æºç ,firebugçœ‹çš„ä¸è¡Œ
+	// çˆ¬è™«+å»ºç«‹ç´¢å¼•
+	//åŒ¹é…é¡µé¢çš„urlåœ°å€
 	public static void main(String[] args) {
 
 		String urlSeed = "http://news.baidu.com/n?cmd=4&class=sportnews&pn=1&from=tab";
@@ -72,7 +73,7 @@ public class MyCrawl {
 			getMethod.setRequestHeader(key, val);
 		}
 
-		// µÃµ½ÍøÒ³Ô´Âë·Åµ½pageSourceCode±äÁ¿ÖĞ
+		// å¾—åˆ°ç½‘é¡µæºç æ”¾åˆ°pageSourceCodeå˜é‡ä¸­
 		try {
 			readPage(getMethod, "utf-8", urlSeed);
 		} catch (Exception e) {
@@ -106,9 +107,9 @@ public class MyCrawl {
 							+ httpClient.executeMethod(method));
 					n--;
 				} else {
-					// »ñÈ¡Í·ĞÅÏ¢
+					// è·å–å¤´ä¿¡æ¯
 					responseHeaders = method.getResponseHeaders();
-					// »ñÈ¡Ò³ÃæÔ´´úÂë
+					// è·å–é¡µé¢æºä»£ç 
 					InputStream inputStream = method.getResponseBodyAsStream();
 					BufferedReader bufferedReader = new BufferedReader(
 							new InputStreamReader(inputStream, charsetName));
@@ -123,7 +124,7 @@ public class MyCrawl {
 							pageSourceCode.getBytes(charsetName));
 					String charset = CharsetUtil.getStreamCharset(in,
 							defaultCharset);
-					// ÏÂÃæÕâ¸öÅĞ¶ÏÊÇÎªÁËIP¹éÊôµØ²éÑ¯ÌØÒâ¼ÓÉÏÈ¥µÄ
+					// ä¸‹é¢è¿™ä¸ªåˆ¤æ–­æ˜¯ä¸ºäº†IPå½’å±åœ°æŸ¥è¯¢ç‰¹æ„åŠ ä¸Šå»çš„
 					if ("Big5".equals(charset)) {
 						charset = "gbk";
 					}
@@ -144,7 +145,7 @@ public class MyCrawl {
 		return false;
 	}
 
-	// ÊµÊ±ËÑË÷
+	// å®æ—¶æœç´¢
 	@Test
 	public void search() {
 		Analyzer analyzer = new StandardAnalyzer(Version.LUCENE_43);
@@ -155,7 +156,7 @@ public class MyCrawl {
 		Directory directory = null;
 		try {
 			directory = NIOFSDirectory.open(new File(indexFile));
-			// ´´½¨Ë÷Òı
+			// åˆ›å»ºç´¢å¼•
 			IndexWriter indexWriter = new IndexWriter(directory,
 					indexWriterConfig);
 			TrackingIndexWriter trackingIndexWriter = new TrackingIndexWriter(
@@ -163,24 +164,24 @@ public class MyCrawl {
 			NRTManager nrtManager = new NRTManager(trackingIndexWriter,
 					new SearcherFactory());
 
-			// ²éÑ¯Ë÷Òı
+			// æŸ¥è¯¢ç´¢å¼•
 			IndexSearcher indexSearch = nrtManager.acquire();
 			/*
-			 * //Ò»°ãµÄ»ñÈ¡indexSearchµÄ·½·¨,·ÇÊµÊ± IndexReader
+			 * //ä¸€èˆ¬çš„è·å–indexSearchçš„æ–¹æ³•,éå®æ—¶ IndexReader
 			 * indexReader=DirectoryReader.open(directory);
 			 * 
 			 * IndexSearcher indexSearch=new IndexSearcher(indexReader);
 			 */
 
-			Term term = new Term("content", "ÎÒÃÇ");
+			Term term = new Term("content", "æˆ‘ä»¬");
 			Query query = new TermQuery(term);
 			TopDocs topDocs = indexSearch.search(query, 10);
-			System.out.println("--------²éÑ¯½á¹û×ÜÊı------");
+			System.out.println("--------æŸ¥è¯¢ç»“æœæ€»æ•°------");
 			int totalHits = topDocs.totalHits;
 			System.out.println("totalHits" + ":" + totalHits);
 
 			for (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-				// scoreDoc.doc»ñÈ¡µÄdocID
+				// scoreDoc.docè·å–çš„docID
 				int docId = scoreDoc.doc;
 
 				System.out.println("docId:" + docId);
